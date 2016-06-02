@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:scrollbars = "horizontal|vertical"
-
+        android:windowSoftInputMode="adjustResize"
         android:id="@+id/messageBoardField"
 
         android:singleLine="false"

@@ -21,14 +21,14 @@ android {
 
     defaultConfig {
         versionCode 12
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 23
 
     }
 
     sourceSets {
         main {
-            manifest.srcFile 'AndroidManifest.xml'
+            manifest.srcFile  'AndroidManifest.xml'
             java.srcDirs = ['src']
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']

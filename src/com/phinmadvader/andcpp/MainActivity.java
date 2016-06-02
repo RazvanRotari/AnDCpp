@@ -141,7 +141,7 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public boolean onLongClick(View view) {
 
-				
+
 
 				return false;
 			}
