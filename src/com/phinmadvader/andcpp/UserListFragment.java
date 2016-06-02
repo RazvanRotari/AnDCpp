@@ -71,8 +71,17 @@ public class UserListFragment extends Fragment {
 							View view, int i, long l) {
 						DCUserComparable user = nickList.get(i);
 						mainActivity.open_file_list(user);
+
 					}
 				});
+		userListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+				DCUserComparable user = nickList.get(i);
+				mainActivity.openChat(user);
+				return true;
+			}
+		});
 
 		filterInput = (EditText) rootView.findViewById(R.id.filterText);
 		filterInput.addTextChangedListener(new TextWatcher() {

@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.Toast;
@@ -26,6 +27,9 @@ import android.widget.Toast;
 import com.phinvader.libjdcpp.DCCommand;
 import com.phinvader.libjdcpp.DCFileList;
 import com.phinvader.libjdcpp.DCMessage;
+import com.phinvader.libjdcpp.DCUser;
+
+import java.util.HashMap;
 
 public class MainActivity extends FragmentActivity implements
 		OnQueryTextListener, DCCommand {
@@ -36,7 +40,7 @@ public class MainActivity extends FragmentActivity implements
 	private Poller poller;
 	private SearchView searchview;
 	private MenuItem searchmenuitem;
-	
+
 	private Intent serviceIntent;
 	private myBroadcastReceiver myBR;
 	private ProgressDialog myProgressDialog;
@@ -47,14 +51,15 @@ public class MainActivity extends FragmentActivity implements
 	public TabPagerAdapter tab_page_adapter;
 	private ViewPager view_pager;
 	private LoginFragment login_fragment;
-	private MessageBoardFragment messageboard_fragment;
+	private MessageFragment messageboard_fragment;
 	private UserListFragment userlist_fragment;
 	private FileListManager filelist_manager;
 	private SearchResultsFragment searchresult_fragment;
+	private HashMap<String, MessageFragment> chatMap;
 
 	boolean exitFlag = false;
 	Toast myToast;
-	
+
 	// FileList stack variables
 	// TODO: This ought to be nested in some filelist management class
 	// (filelistfragment? sth new?) and not strewn around randomly as presently
@@ -76,6 +81,7 @@ public class MainActivity extends FragmentActivity implements
 			mService.setBoard_message_handler(MainActivity.this);
 			mService.setSearch_handler(MainActivity.this);
 			mService.setUser_handler(MainActivity.this);
+			mService.setchat_handler(MainActivity.this);
 			// Reffer onCommand(msg) for above callback setups
 		}
 
@@ -93,6 +99,7 @@ public class MainActivity extends FragmentActivity implements
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+
 				if (msg.command.equals("MyINFO")) {
 					if (userlist_fragment != null && userlist_fragment.is_ready)
 						userlist_fragment.addOneNick(msg);
@@ -106,6 +113,11 @@ public class MainActivity extends FragmentActivity implements
 					if (messageboard_fragment != null
 							&& messageboard_fragment.is_ready)
 						messageboard_fragment.add_msg(msg.msg_s);
+				} else if (msg.command.equals("To")) {
+					if (!chatMap.containsKey(msg.buddy)) {
+						openChat(msg.buddy);
+					}
+					chatMap.get(msg.buddy.nick).add_msg(msg.msg_s);
 				}
 			}
 		});
@@ -124,6 +136,16 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		view_pager = (ViewPager) findViewById(R.id.pager_root);
 		view_pager.setOffscreenPageLimit(32); // TODO : FIXTHIS
+		view_pager.setOnLongClickListener(new View.OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View view) {
+
+				
+
+				return false;
+			}
+		});
 		// ^ this is a hack, basically without this fragments keep getting
 		// recreated which is painful for us to maintain state, moreover
 		// saveinstance doesn't seem to work on loginframgnet, resulting in
@@ -137,12 +159,13 @@ public class MainActivity extends FragmentActivity implements
 																// view_pager
 
 		login_fragment = new LoginFragment();
-		messageboard_fragment = new MessageBoardFragment();
+		messageboard_fragment = new MessageFragment();
 		userlist_fragment = new UserListFragment();
 		searchresult_fragment = new SearchResultsFragment();
 		tab_page_adapter.add_tab(TabPagerAdapter.TAB_LOGININFO,
 				(Fragment) login_fragment, "Login Info");
 		Log.d("andcpp", "CREATION");
+		chatMap = new HashMap<String, MessageFragment>();
 	}
 
 	@Override
@@ -189,7 +212,7 @@ public class MainActivity extends FragmentActivity implements
 		searchmenuitem.setVisible(false);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
@@ -197,7 +220,7 @@ public class MainActivity extends FragmentActivity implements
 			Intent settingsIntent = new Intent(this, Settings.class);
 			startActivity(settingsIntent);
 			return true;
-		
+
 		case R.id.action_search:
 			//don't know what this was supposed to do!
 			return true;
@@ -206,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 	 		}
 	 	}
-	
+
 	@Override
 	protected void onPause() {
 		poller.stop();
@@ -243,12 +266,12 @@ public class MainActivity extends FragmentActivity implements
 		IntentFilter intFil = new IntentFilter("ACTION_DO_SOMETHING");
 		intFil.addCategory(Intent.CATEGORY_DEFAULT);
 		registerReceiver(myBR, intFil);
-		
+
 		myProgressDialog = new ProgressDialog(MainActivity.this);
 		myProgressDialog.setMessage("Connecting...");
 		myProgressDialog.setCanceledOnTouchOutside(false);
 		myProgressDialog.show();
-		
+
 		serviceIntent = new Intent(this, DCPPService.class);
 		serviceIntent.putExtra("nick", nick);
 		serviceIntent.putExtra("ip", ip);
@@ -341,46 +364,57 @@ public class MainActivity extends FragmentActivity implements
 		});
 		fileDownloadThread.start();
 	}
-	
+
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) 
-	{  
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
 	    if (keyCode == KeyEvent.KEYCODE_BACK)
 	    {
 	    	int currentItem = view_pager.getCurrentItem();
 	    	if(currentItem > 0)
 	    		 view_pager.setCurrentItem(currentItem - 1);
-	    	
+
 	    	else if(exitFlag){
-	    		// in case the user opens the app again before activity is destroyed, 
+	    		// in case the user opens the app again before activity is destroyed,
 	    		// flag will be false so it will exit when back is pressed once and we don't want that!
 	    		exitFlag = false;
-	    		
+
 	    		//canceling the toast looks nice!
 	    		if (myToast != null)
 	    			myToast.cancel();
-	    		
+
 	    		super.onBackPressed();
 	    		return true;
 	    	}
-	    	
+
 	    	else if(!exitFlag){
 	    		myToast = Toast.makeText(getApplicationContext(), "Please press back again to exit", Toast.LENGTH_SHORT);
 	    		myToast.show();
 	    		exitFlag = true;
-	    		
+
 	    		new Handler().postDelayed(new Runnable() {
 
 	    	        @Override
 	    	        public void run() {
-	    	            exitFlag=false;                       
+	    	            exitFlag=false;
 	    	        }
 	    	    }, 2000);
 	    	}
 	    	// Must return true if we handles the event!
 	    	return true;
 	    }
-	    return false; 
+	    return false;
+	}
+
+	public void openChat(DCUser user) {
+		if (chatMap.containsKey(user.nick)) {
+			return;
+		}
+		MessageFragment chatFragment = new MessageFragment();
+		chatFragment.setBuddy(user);
+		tab_page_adapter.add_tab(TabPagerAdapter.TAB_CHAT,
+				chatFragment, user.nick);
+		chatMap.put(user.nick, chatFragment);
 	}
 
 	public class myBroadcastReceiver extends BroadcastReceiver{
@@ -395,7 +429,9 @@ public class MainActivity extends FragmentActivity implements
 			if (inBun.getBoolean("stopProgressDialogFlag"))
 				if(myProgressDialog.isShowing())
 					myProgressDialog.dismiss();
-		}	
+		}
 	}
-	
+
+
+
 }

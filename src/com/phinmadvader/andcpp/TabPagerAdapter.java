@@ -19,7 +19,8 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter implements
 	public final static int TAB_USERLIST = 2;
 	public final static int TAB_SEARCHLIST = 3;
 	public final static int TAB_FILELIST = 4;
-	private final static int TOTAL_TABS = 5;
+	public final static int TAB_CHAT = 5;
+	private final static int TOTAL_TABS = 6;
 
 	private boolean[] tab_is_visible;
 	private int active_tab_count = 0;

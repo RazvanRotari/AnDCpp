@@ -1,14 +1,11 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
-
-
     dependencies {
         classpath 'com.android.tools.build:gradle:2.+'
     }
 }
-
 
 apply plugin: 'com.android.application'
 
@@ -26,6 +23,7 @@ android {
         versionCode 12
         minSdkVersion 16
         targetSdkVersion 23
+
     }
 
     sourceSets {
@@ -41,4 +39,5 @@ android {
 
         androidTest.setRoot('tests')
     }
+
 }

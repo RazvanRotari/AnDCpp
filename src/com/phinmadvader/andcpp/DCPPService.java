@@ -68,8 +68,9 @@ public class DCPPService extends IntentService {
 	private DCCommand board_message_handler = null;
 	private DCCommand user_handler = null;
 	private DCCommand search_handler = null;
+	private DCCommand chat_handler = null;
 	private DCPreferences prefs;
-	private DCUser myuser;
+	public DCUser myuser;
 	public int downloadID = 1;
 	NotificationManager mNotifyManager2;
 	public LinkedBlockingQueue<DCMessage> search_results;
@@ -397,12 +398,24 @@ public class DCPPService extends IntentService {
 		board_message_handler = handler;
 	}
 
+	public void sendMainBoardMessage(String message) {
+        client.sendBoardMessage(myuser, message);
+    }
+
+	public void sendPrivateMessage(DCUser user, String message) {
+		client.sendPrivateMessage(myuser, user, message);
+	}
+
 	public void setUser_handler(DCCommand handler) {
 		user_handler = handler;
 	}
 
 	public void setSearch_handler(DCCommand handler) {
 		search_handler = handler;
+	}
+
+	public void setchat_handler(DCCommand handler) {
+		chat_handler = handler;
 	}
 
 	private class MyUserHandler implements DCCommand {
@@ -427,6 +440,14 @@ public class DCPPService extends IntentService {
 		public void onCommand(DCMessage dcMessage) {
 			if (board_message_handler != null)
 				board_message_handler.onCommand(dcMessage);
+		}
+	}
+
+	private class MyChatMessageHandler implements DCCommand {
+		@Override
+		public void onCommand(DCMessage dcMessage) {
+			if (chat_handler != null)
+				chat_handler.onCommand(dcMessage);
 		}
 	}
 
@@ -505,6 +526,7 @@ public class DCPPService extends IntentService {
 				client.setCustomUserChangeHandler(new MyUserHandler());
 				client.setCustomBoardMessageHandler(new MyBoardMessageHandler());
 				client.setCustomSearchHandler(new MySearchHandler());
+				client.setChatMessageHandler(new MyChatMessageHandler());
 				client.InitiateDefaultRouting();
 				status = DCClientStatus.CONNECTED;
 				is_connected = true;
