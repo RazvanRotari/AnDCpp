@@ -1,0 +1,2 @@
+include 'libjdcpp'
+project(':libjdcpp').projectDir = new File('libs/libjdcpp')
