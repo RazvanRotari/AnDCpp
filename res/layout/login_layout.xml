@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
+              android:layout_height="match_parent"
+              android:windowSoftInputMode="adjustResize">
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,6 +45,20 @@
             android:layout_gravity="center"/>
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Password"
+        android:id="@+id/textViewPassword"
+        android:layout_gravity="left|center_vertical"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/password"
+        android:layout_gravity="center"
+        android:inputType="textPassword"/>
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
@@ -63,3 +81,4 @@
             android:layout_gravity="center"/>
 
 </LinearLayout>
+</ScrollView>

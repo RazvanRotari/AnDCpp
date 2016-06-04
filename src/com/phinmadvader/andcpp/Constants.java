@@ -11,6 +11,7 @@ public class Constants {
     public static String PREFS_NAME = "ANDCPPSETTINGS";
     public static String SETTINGS_IP_KEY = "dcipaddr";
     public static String SETTINGS_NICK_KEY = "dcnick";
+    public static String SETTINGS_PASSWORD_KEY = "dcpassword";
     public static int MAX_DOWNLOAD_Q = 128;
     public static int DOWNLOAD_TIMEOUT_MILLIS = 10000;
     public static int DOWNLOAD_UPDATE_INTERVAL_MILLIS = 100; // Updates all download activities every 200ms

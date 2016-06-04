@@ -82,6 +82,7 @@ public class MainActivity extends FragmentActivity implements
 			mService.setSearch_handler(MainActivity.this);
 			mService.setUser_handler(MainActivity.this);
 			mService.setchat_handler(MainActivity.this);
+
 			// Reffer onCommand(msg) for above callback setups
 		}
 
@@ -261,7 +262,7 @@ public class MainActivity extends FragmentActivity implements
 		return false;
 	}
 
-	public void startBackgroundService(String nick, String ip, String port) {
+	public void startBackgroundService(String nick, String password, String ip, String port) {
 		myBR = new myBroadcastReceiver();
 		IntentFilter intFil = new IntentFilter("ACTION_DO_SOMETHING");
 		intFil.addCategory(Intent.CATEGORY_DEFAULT);
@@ -276,6 +277,7 @@ public class MainActivity extends FragmentActivity implements
 		serviceIntent.putExtra("nick", nick);
 		serviceIntent.putExtra("ip", ip);
 		serviceIntent.putExtra("port", port);
+		serviceIntent.putExtra("password", password);
 		startService(serviceIntent);
 
 	}

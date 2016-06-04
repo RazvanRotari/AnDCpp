@@ -500,10 +500,17 @@ public class DCPPService extends IntentService {
 					exceptionCaught("Invalid Port number");
 					return;
 				}
+
 				prefs = new DCPreferences(nick, 17000L * 1024 * 1024, ip);
 				myuser = new DCUser();
 				myuser.nick = nick;
+
+
 				client = new DCClient();
+				if (data.containsKey("password")) {
+					myuser.password = data.getString("password");
+					client.setPassword(data.getString("password"));
+				}
 				try {
 					client.connect(ip, port, prefs);
 				} catch (UnknownHostException e) {
@@ -586,6 +593,7 @@ public class DCPPService extends IntentService {
 		if (is_connected) {
 			is_connected = false;
 			status = DCClientStatus.DISCONNECTED;
+			client.setPassword("");
 			stopForeground(true);
 			synchronized (this) {
 				this.notify();

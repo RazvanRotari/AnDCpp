@@ -25,6 +25,7 @@ public class LoginFragment extends Fragment {
 	private Button connectButton;
 	private EditText nickText;
 	private EditText ipText;
+	private EditText passwordText;
 	private final static String ConnectString = "Connect";
 	private final static String DisconnectString = "Disconnect";
 	private boolean is_connected = false;
@@ -39,6 +40,7 @@ public class LoginFragment extends Fragment {
 		downloadLocation = (TextView) rootView.findViewById(R.id.textView5);
 		nickText = (EditText) rootView.findViewById(R.id.editText2);
 		ipText = (EditText) rootView.findViewById(R.id.editText);
+		passwordText = (EditText)rootView.findViewById(R.id.password);
 		downloadLocation.setText(Settings.getDCDownloadsDirectory(getActivity()));
 		connectButton = (Button) rootView.findViewById(R.id.button);
 		connectButton.setText(ConnectString);
@@ -61,8 +63,11 @@ public class LoginFragment extends Fragment {
 				Constants.SETTINGS_IP_KEY, "");
 		String nick = mainActivity.getprefs().getString(
 				Constants.SETTINGS_NICK_KEY, "");
+		String password = mainActivity.getprefs().getString(
+				Constants.SETTINGS_PASSWORD_KEY, "");
 		nickText.setText(nick);
 		ipText.setText(ip);
+		passwordText.setText(password);
 		if (savedInstanceState != null)
 			is_connected = savedInstanceState
 					.getBoolean(VIEW_IS_CONNECTED_BUNDLE_KEY);
@@ -114,6 +119,7 @@ public class LoginFragment extends Fragment {
 	public void connect() {
 		String nick = nickText.getText().toString();
 		String ip_original = ipText.getText().toString();
+		String password = passwordText.getText().toString();
 		String ip = ip_original;
 		String[] ip_port_raw = ip_original.split(":");
 		String port = "411";
@@ -147,10 +153,11 @@ public class LoginFragment extends Fragment {
 		SharedPreferences.Editor editor = mainActivity.getprefs().edit();
 		editor.putString(Constants.SETTINGS_NICK_KEY, nick);
 		editor.putString(Constants.SETTINGS_IP_KEY, ip_original);
+		editor.putString(Constants.SETTINGS_PASSWORD_KEY, password);
 		editor.commit();
 
 		// Connect
-		mainActivity.startBackgroundService(nick, ip, port);
+		mainActivity.startBackgroundService(nick, password, ip, port);
 	}
 	public static class Connectivity {
 	    public static NetworkInfo getNetworkInfo(Context context){
